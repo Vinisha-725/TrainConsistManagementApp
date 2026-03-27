@@ -1,49 +1,50 @@
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.List;
+
+class GoodsBogie {
+    String type;
+    String cargo;
+
+    public GoodsBogie(String type, String cargo) {
+        this.type = type;
+        this.cargo = cargo;
+    }
+
+    public String getType() { return type; }
+    public String getCargo() { return cargo; }
+
+    @Override
+    public String toString() {
+        return "GoodsBogie{Type='" + type + "', Cargo='" + cargo + "'}";
+    }
+}
 
 public class TrainConsistManagementApp {
-
-    // Regex Constants
-    // TRN- followed by exactly 4 digits
-    private static final String TRAIN_ID_REGEX = "^TRN-\\d{4}$";
-    // PET- followed by exactly 2 uppercase letters
-    private static final String CARGO_CODE_REGEX = "^PET-[A-Z]{2}$";
-
     public static void main(String[] args) {
-        // Test cases for Train ID
-        validateTrainID("TRN-1234"); // Valid
-        validateTrainID("TRAIN12");  // Invalid (Wrong prefix)
-        validateTrainID("TRN-123");   // Invalid (Too short)
+        // 1. Prepare a list of goods bogies
+        List<GoodsBogie> goodsConsist = new ArrayList<>();
+        goodsConsist.add(new GoodsBogie("Rectangular", "Coal"));
+        goodsConsist.add(new GoodsBogie("Cylindrical", "Petroleum"));
+        goodsConsist.add(new GoodsBogie("Cylindrical", "Petroleum"));
+        goodsConsist.add(new GoodsBogie("Box", "Grain"));
 
-        // Test cases for Cargo Code
-        validateCargoCode("PET-AB"); // Valid
-        validateCargoCode("PET-ab"); // Invalid (Lowercase)
-        validateCargoCode("PET-12"); // Invalid (Digits instead of letters)
-    }
+        // 2. Stream, 3. allMatch() with 4. Conditional Logic
+        // Rule: If type is "Cylindrical", cargo MUST be "Petroleum"
+        boolean isTrainSafe = goodsConsist.stream().allMatch(bogie -> {
+            if (bogie.getType().equalsIgnoreCase("Cylindrical")) {
+                return bogie.getCargo().equalsIgnoreCase("Petroleum");
+            }
+            return true; // Non-cylindrical bogies pass this specific rule
+        });
 
-    public static boolean validateTrainID(String trainID) {
-        Pattern pattern = Pattern.compile(TRAIN_ID_REGEX);
-        Matcher matcher = pattern.matcher(trainID);
+        // 5. Display Result
+        System.out.println("--- Safety Compliance Report ---");
+        goodsConsist.forEach(System.out::println);
 
-        if (matcher.matches()) {
-            System.out.println("✔ Valid Train ID: " + trainID);
-            return true;
+        if (isTrainSafe) {
+            System.out.println("\n✅ STATUS: Train is Safety Compliant. Ready for departure.");
         } else {
-            System.out.println("❌ Invalid Train ID: " + trainID);
-            return false;
-        }
-    }
-
-    public static boolean validateCargoCode(String cargoCode) {
-        Pattern pattern = Pattern.compile(CARGO_CODE_REGEX);
-        Matcher matcher = pattern.matcher(cargoCode);
-
-        if (matcher.matches()) {
-            System.out.println("✔ Valid Cargo Code: " + cargoCode);
-            return true;
-        } else {
-            System.out.println("❌ Invalid Cargo Code: " + cargoCode);
-            return false;
+            System.out.println("\n❌ STATUS: SAFETY VIOLATION DETECTED! Check Cylindrical bogie cargo.");
         }
     }
 }
