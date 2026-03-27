@@ -39,5 +39,8 @@ public class TrainConsistManagementApp {
 
         // Verification of Original List Integrity
         System.out.println("\nIntegrity Check: Original list still has " + bogies.size() + " bogies.");
+public class TrainConsistManagementApp {
+    public static void main(String[] args) {
+       
     }
 }
