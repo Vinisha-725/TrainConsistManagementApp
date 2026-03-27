@@ -1,22 +1,11 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-class GoodsBogie {
-    String type;
-    String cargo;
-
-    public GoodsBogie(String type, String cargo) {
-        this.type = type;
-        this.cargo = cargo;
-    }
-
-    public String getType() { return type; }
-    public String getCargo() { return cargo; }
-
-    @Override
-    public String toString() {
-        return "GoodsBogie{Type='" + type + "', Cargo='" + cargo + "'}";
-    }
+class Bogie {
+    int capacity;
+    public Bogie(int capacity) { this.capacity = capacity; }
+    public int getCapacity() { return capacity; }
 }
 
 class Bogie {
@@ -59,30 +48,39 @@ public class TrainConsistManagementApp {
         System.out.println("\nIntegrity Check: Original list still has " + bogies.size() + " bogies.");
 public class TrainConsistManagementApp {
     public static void main(String[] args) {
-        // 1. Prepare a list of goods bogies
-        List<GoodsBogie> goodsConsist = new ArrayList<>();
-        goodsConsist.add(new GoodsBogie("Rectangular", "Coal"));
-        goodsConsist.add(new GoodsBogie("Cylindrical", "Petroleum"));
-        goodsConsist.add(new GoodsBogie("Cylindrical", "Petroleum"));
-        goodsConsist.add(new GoodsBogie("Box", "Grain"));
+        // 1. Prepare a large collection of bogies for meaningful measurement
+        List<Bogie> bogies = new ArrayList<>();
+        for (int i = 0; i < 100000; i++) {
+            bogies.add(new Bogie((int) (Math.random() * 100)));
+        }
 
-        // 2. Stream, 3. allMatch() with 4. Conditional Logic
-        // Rule: If type is "Cylindrical", cargo MUST be "Petroleum"
-        boolean isTrainSafe = goodsConsist.stream().allMatch(bogie -> {
-            if (bogie.getType().equalsIgnoreCase("Cylindrical")) {
-                return bogie.getCargo().equalsIgnoreCase("Petroleum");
+        // --- LOOP BASED FILTERING ---
+        long startLoop = System.nanoTime();
+        List<Bogie> loopResult = new ArrayList<>();
+        for (Bogie b : bogies) {
+            if (b.getCapacity() > 60) {
+                loopResult.add(b);
             }
-            return true; // Non-cylindrical bogies pass this specific rule
-        });
+        }
+        long endLoop = System.nanoTime();
+        long loopDuration = endLoop - startLoop;
 
-        // 5. Display Result
-        System.out.println("--- Safety Compliance Report ---");
-        goodsConsist.forEach(System.out::println);
+        // --- STREAM BASED FILTERING ---
+        long startStream = System.nanoTime();
+        List<Bogie> streamResult = bogies.stream()
+                .filter(b -> b.getCapacity() > 60)
+                .collect(Collectors.toList());
+        long endStream = System.nanoTime();
+        long streamDuration = endStream - startStream;
 
-        if (isTrainSafe) {
-            System.out.println("\n✅ STATUS: Train is Safety Compliant. Ready for departure.");
-        } else {
-            System.out.println("\n❌ STATUS: SAFETY VIOLATION DETECTED! Check Cylindrical bogie cargo.");
+        // 5 & 6. Display Results
+        System.out.println("--- Performance Comparison (100,000 Bogies) ---");
+        System.out.println("Loop Duration   : " + loopDuration + " ns");
+        System.out.println("Stream Duration : " + streamDuration + " ns");
+
+        // Validation: Ensure results are identical
+        if (loopResult.size() == streamResult.size()) {
+            System.out.println("\n✅ Logic Check: Both methods returned " + loopResult.size() + " bogies.");
         }
 import java.util.*
 public class TrainConsistManagementApp {
