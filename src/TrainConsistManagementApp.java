@@ -1,48 +1,66 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-class Bogie {
-    int capacity;
-    public Bogie(int capacity) { this.capacity = capacity; }
-    public int getCapacity() { return capacity; }
+// 1. Define the Custom Exception Class
+class InvalidCapacityException extends Exception {
+    public InvalidCapacityException(String message) {
+        super(message);
+    }
 }
 
+// 2. Define the PassengerBogie class with Fail-Fast Validation
+class PassengerBogie {
+    private String type;
+    private int capacity;
+
+    public PassengerBogie(String type, int capacity) throws InvalidCapacityException {
+        if (capacity <= 0) {
+            throw new InvalidCapacityException("Capacity must be greater than zero");
+        }
+        this.type = type;
+        this.capacity = capacity;
+    }
+
+    // Getters
+    public String getType() { return type; }
+    public int getCapacity() { return capacity; }
+
+    @Override
+    public String toString() {
+        return "PassengerBogie{Type='" + type + "', Capacity=" + capacity + "}";
+    }
+}
+
+// 3. Main Application Class
 public class TrainConsistManagementApp {
     public static void main(String[] args) {
-        // 1. Prepare a large collection of bogies for meaningful measurement
-        List<Bogie> bogies = new ArrayList<>();
-        for (int i = 0; i < 100000; i++) {
-            bogies.add(new Bogie((int) (Math.random() * 100)));
+        System.out.println("=== Train Consist Management System: UC14 ===");
+
+        // Scenario A: Valid Bogie Creation
+        try {
+            System.out.println("\n[Action] Creating a standard Sleeper bogie...");
+            PassengerBogie s1 = new PassengerBogie("Sleeper", 72);
+            System.out.println("✅ Success: " + s1);
+        } catch (InvalidCapacityException e) {
+            System.err.println("❌ Error: " + e.getMessage());
         }
 
-        // --- LOOP BASED FILTERING ---
-        long startLoop = System.nanoTime();
-        List<Bogie> loopResult = new ArrayList<>();
-        for (Bogie b : bogies) {
-            if (b.getCapacity() > 60) {
-                loopResult.add(b);
-            }
+        // Scenario B: Zero Capacity Validation
+        try {
+            System.out.println("\n[Action] Creating an AC Chair bogie with 0 capacity...");
+            PassengerBogie s2 = new PassengerBogie("AC Chair", 0);
+            // This line will be skipped because an exception is thrown above
+            System.out.println("✅ Success: " + s2);
+        } catch (InvalidCapacityException e) {
+            System.err.println("❌ Error: " + e.getMessage());
         }
-        long endLoop = System.nanoTime();
-        long loopDuration = endLoop - startLoop;
 
-        // --- STREAM BASED FILTERING ---
-        long startStream = System.nanoTime();
-        List<Bogie> streamResult = bogies.stream()
-                .filter(b -> b.getCapacity() > 60)
-                .collect(Collectors.toList());
-        long endStream = System.nanoTime();
-        long streamDuration = endStream - startStream;
-
-        // 5 & 6. Display Results
-        System.out.println("--- Performance Comparison (100,000 Bogies) ---");
-        System.out.println("Loop Duration   : " + loopDuration + " ns");
-        System.out.println("Stream Duration : " + streamDuration + " ns");
-
-        // Validation: Ensure results are identical
-        if (loopResult.size() == streamResult.size()) {
-            System.out.println("\n✅ Logic Check: Both methods returned " + loopResult.size() + " bogies.");
+        // Scenario C: Negative Capacity Validation
+        try {
+            System.out.println("\n[Action] Creating a First Class bogie with -10 capacity...");
+            PassengerBogie s3 = new PassengerBogie("First Class", -10);
+            System.out.println("✅ Success: " + s3);
+        } catch (InvalidCapacityException e) {
+            System.err.println("❌ Error: " + e.getMessage());
         }
+
+        System.out.println("\n=== Program Execution Continued Safely ===");
     }
 }
