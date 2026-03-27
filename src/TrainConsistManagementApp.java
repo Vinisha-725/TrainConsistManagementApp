@@ -1,8 +1,8 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-// Assuming the Bogie class from previous Use Cases
 class Bogie {
     String type;
     int capacity;
@@ -12,6 +12,8 @@ class Bogie {
         this.capacity = capacity;
     }
 
+    public String getType() { return type; }
+
     @Override
     public String toString() {
         return "Bogie{Type='" + type + "', Capacity=" + capacity + "}";
@@ -20,33 +22,26 @@ class Bogie {
 
 public class TrainConsistManagementApp {
     public static void main(String[] args) {
-        // 1. Reuse/Create the Bogie list (UC7 Context)
+        // 1. Create a list of bogies (Reuse logic from UC7/UC8)
         List<Bogie> bogies = new ArrayList<>();
         bogies.add(new Bogie("Sleeper", 72));
-        bogies.add(new Bogie("AC Chair Car", 56));
-        bogies.add(new Bogie("First Class", 24));
-        bogies.add(new Bogie("General", 80));
+        bogies.add(new Bogie("AC Chair", 56));
         bogies.add(new Bogie("Sleeper", 72));
+        bogies.add(new Bogie("First Class", 24));
+        bogies.add(new Bogie("AC Chair", 56));
 
-        System.out.println("--- Original Consist ---");
-        bogies.forEach(System.out::println);
+        // 2. Convert to stream, 3. Apply groupingBy, 4. Store in Map
+        Map<String, List<Bogie>> groupedBogies = bogies.stream()
+                .collect(Collectors.groupingBy(Bogie::getType));
 
-        // 2. Convert to Stream, 3. Filter, 4. Collect
-        // Condition: Capacity > 60
-        List<Bogie> highCapacityBogies = bogies.stream()
-                .filter(b -> b.capacity > 60)
-                .collect(Collectors.toList());
-        // Note: In Java 16+, you can use .toList() directly
+        // 5. Display Grouped Result
+        System.out.println("--- Grouped Train Consist Report ---");
+        groupedBogies.forEach((type, list) -> {
+            System.out.println("Category: [" + type + "] - Count: " + list.size());
+            list.forEach(b -> System.out.println("  -> " + b));
+        });
 
-        // 5. Display Filtered Bogies
-        System.out.println("\n--- High-Capacity Bogies (Capacity > 60) ---");
-        if (highCapacityBogies.isEmpty()) {
-            System.out.println("No bogies match the criteria.");
-        } else {
-            highCapacityBogies.forEach(System.out::println);
-        }
-
-        // Integrity Check: Original list remains unchanged
-        System.out.println("\nOriginal list size: " + bogies.size());
+        // Verification of Original List Integrity
+        System.out.println("\nOriginal list size remains: " + bogies.size());
     }
 }
