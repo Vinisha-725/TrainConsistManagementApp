@@ -45,5 +45,9 @@ public class TrainConsistManagementApp {
             System.out.println("❌ Invalid Cargo Code: " + cargoCode);
             return false;
         }
+import java.util.*
+public class TrainConsistManagementApp {
+    public static void main(String[] args) {
+       
     }
 }
