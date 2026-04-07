@@ -9,8 +9,8 @@ class CargoSafetyException extends RuntimeException {
 
 // Goods Bogie Class
 class GoodsBogie {
-    String shape;   // Rectangular / Cylindrical
-    String cargo;   // Petroleum, Coal, etc.
+    private String shape;   // Rectangular / Cylindrical
+    private String cargo;   // Petroleum, Coal, etc.
 
     public GoodsBogie(String shape) {
         this.shape = shape;
@@ -39,22 +39,32 @@ public class TrainConsistManagementApp {
 
     // Cargo assignment logic with try-catch-finally
     public static void assignCargo(GoodsBogie bogie, String cargoType) {
+
         try {
-            // Validation
+            // ✅ Null safety check
+            if (bogie == null || cargoType == null) {
+                throw new IllegalArgumentException("Bogie or cargo cannot be null");
+            }
+
+            // ✅ Validation
             if (bogie.getShape().equalsIgnoreCase("Rectangular") &&
-                    cargoType.equalsIgnoreCase("Petroleum")) {
+                cargoType.equalsIgnoreCase("Petroleum")) {
 
                 throw new CargoSafetyException(
                         "Unsafe Cargo! Petroleum cannot be assigned to Rectangular bogie.");
             }
 
-            // Safe assignment
+            // ✅ Safe assignment
             bogie.setCargo(cargoType);
             System.out.println("Cargo assigned successfully: " + cargoType);
 
         } catch (CargoSafetyException e) {
-            // Handle exception
+            // Handle custom exception
             System.out.println("ERROR: " + e.getMessage());
+
+        } catch (Exception e) {
+            // Handle unexpected errors
+            System.out.println("Unexpected error: " + e.getMessage());
 
         } finally {
             // Always executes
@@ -67,13 +77,13 @@ public class TrainConsistManagementApp {
         GoodsBogie b1 = new GoodsBogie("Cylindrical");
         GoodsBogie b2 = new GoodsBogie("Rectangular");
 
-        // Safe assignment
+        // ✅ Safe assignment
         assignCargo(b1, "Petroleum");
 
-        // Unsafe assignment
+        // ❌ Unsafe assignment (handled safely)
         assignCargo(b2, "Petroleum");
 
-        // Program continues
+        // ✅ Program continues
         assignCargo(b2, "Coal");
 
         System.out.println("Final Bogie States:");
