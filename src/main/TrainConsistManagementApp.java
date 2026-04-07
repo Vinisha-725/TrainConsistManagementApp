@@ -1,21 +1,45 @@
 package main;
 
-import java.util.Arrays;
+import java.util.Scanner;
 
 public class TrainConsistManagementApp {
 
+    // Linear search method
+    public static boolean linearSearchBogie(String[] bogieIDs, String searchKey) {
+        for (int i = 0; i < bogieIDs.length; i++) {
+            if (bogieIDs[i].equals(searchKey)) {
+                System.out.println("Bogie ID found at index: " + i);
+                return true; // early termination on match
+            }
+        }
+        System.out.println("Bogie ID not found.");
+        return false;
+    }
+
     public static void main(String[] args) {
+        // Array of bogie IDs (unsorted)
+        String[] bogieIDs = {"BG101", "BG205", "BG309", "BG412", "BG550"};
 
-        // Array of bogie type names
-        String[] bogieTypes = {"Sleeper", "AC Chair", "First Class", "General", "Luxury"};
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Bogie IDs in the consist:");
+        for (String id : bogieIDs) {
+            System.out.print(id + " ");
+        }
+        System.out.println("\n");
 
-        System.out.println("Before Sorting:");
-        System.out.println(Arrays.toString(bogieTypes));
+        // Accept search key from user
+        System.out.print("Enter Bogie ID to search: ");
+        String searchKey = sc.nextLine().trim();
 
-        // Sort alphabetically using built-in Arrays.sort()
-        Arrays.sort(bogieTypes);
+        // Perform linear search
+        boolean found = linearSearchBogie(bogieIDs, searchKey);
 
-        System.out.println("After Sorting:");
-        System.out.println(Arrays.toString(bogieTypes));
+        if (found) {
+            System.out.println("Search Result: Bogie exists in the consist.");
+        } else {
+            System.out.println("Search Result: Bogie does NOT exist in the consist.");
+        }
+
+        sc.close();
     }
 }
