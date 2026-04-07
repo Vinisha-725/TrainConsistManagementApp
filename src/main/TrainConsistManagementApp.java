@@ -1,18 +1,16 @@
-package main;
-
 import java.util.Arrays;
 import java.util.Scanner;
 
 public class TrainConsistManagementApp {
 
-    // Binary Search method (returns true if bogie exists)
-    public static boolean binarySearchBogie(String[] bogieIDs, String searchKey) {
+    // Binary Search with defensive check
+    public static boolean searchBogieWithValidation(String[] bogieIDs, String searchKey) {
+        // Defensive programming: check if bogie array is empty
         if (bogieIDs == null || bogieIDs.length == 0) {
-            System.out.println("Bogie list is empty.");
-            return false;
+            throw new IllegalStateException("Cannot search: No bogies are available in the train.");
         }
 
-        // Ensure array is sorted before searching
+        // Optional: sort the array for binary search
         Arrays.sort(bogieIDs);
 
         int low = 0;
@@ -26,9 +24,9 @@ public class TrainConsistManagementApp {
                 System.out.println("Bogie ID found at index: " + mid);
                 return true;
             } else if (cmp < 0) {
-                low = mid + 1; // search right half
+                low = mid + 1;
             } else {
-                high = mid - 1; // search left half
+                high = mid - 1;
             }
         }
 
@@ -37,22 +35,30 @@ public class TrainConsistManagementApp {
     }
 
     public static void main(String[] args) {
-        // Example bogie IDs (unsorted input)
-        String[] bogieIDs = {"BG309", "BG101", "BG550", "BG205", "BG412"};
-
-        System.out.println("Original Bogie IDs:");
-        System.out.println(Arrays.toString(bogieIDs));
+        // Example bogie arrays
+        String[] bogies = {"BG309", "BG101", "BG550", "BG205", "BG412"};
+        String[] emptyBogies = {};
 
         Scanner sc = new Scanner(System.in);
+
+        // Attempt search on non-empty array
+        System.out.println("Searching in a non-empty bogie array:");
         System.out.print("Enter Bogie ID to search: ");
         String searchKey = sc.nextLine().trim();
 
-        boolean found = binarySearchBogie(bogieIDs, searchKey);
+        try {
+            boolean found = searchBogieWithValidation(bogies, searchKey);
+            System.out.println("Search Result: " + (found ? "Bogie exists." : "Bogie does NOT exist."));
+        } catch (IllegalStateException e) {
+            System.out.println("ERROR: " + e.getMessage());
+        }
 
-        if (found) {
-            System.out.println("Search Result: Bogie exists in the consist.");
-        } else {
-            System.out.println("Search Result: Bogie does NOT exist in the consist.");
+        // Attempt search on empty array
+        System.out.println("\nSearching in an empty bogie array:");
+        try {
+            searchBogieWithValidation(emptyBogies, "BG101");
+        } catch (IllegalStateException e) {
+            System.out.println("ERROR: " + e.getMessage());
         }
 
         sc.close();
