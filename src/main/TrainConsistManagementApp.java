@@ -1,38 +1,53 @@
 package main;
 
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class TrainConsistManagementApp {
 
-    // Linear search method
-    public static boolean linearSearchBogie(String[] bogieIDs, String searchKey) {
-        for (int i = 0; i < bogieIDs.length; i++) {
-            if (bogieIDs[i].equals(searchKey)) {
-                System.out.println("Bogie ID found at index: " + i);
-                return true; // early termination on match
+    // Binary Search method (returns true if bogie exists)
+    public static boolean binarySearchBogie(String[] bogieIDs, String searchKey) {
+        if (bogieIDs == null || bogieIDs.length == 0) {
+            System.out.println("Bogie list is empty.");
+            return false;
+        }
+
+        // Ensure array is sorted before searching
+        Arrays.sort(bogieIDs);
+
+        int low = 0;
+        int high = bogieIDs.length - 1;
+
+        while (low <= high) {
+            int mid = low + (high - low) / 2;
+            int cmp = bogieIDs[mid].compareTo(searchKey);
+
+            if (cmp == 0) {
+                System.out.println("Bogie ID found at index: " + mid);
+                return true;
+            } else if (cmp < 0) {
+                low = mid + 1; // search right half
+            } else {
+                high = mid - 1; // search left half
             }
         }
+
         System.out.println("Bogie ID not found.");
         return false;
     }
 
     public static void main(String[] args) {
-        // Array of bogie IDs (unsorted)
-        String[] bogieIDs = {"BG101", "BG205", "BG309", "BG412", "BG550"};
+        // Example bogie IDs (unsorted input)
+        String[] bogieIDs = {"BG309", "BG101", "BG550", "BG205", "BG412"};
+
+        System.out.println("Original Bogie IDs:");
+        System.out.println(Arrays.toString(bogieIDs));
 
         Scanner sc = new Scanner(System.in);
-        System.out.println("Bogie IDs in the consist:");
-        for (String id : bogieIDs) {
-            System.out.print(id + " ");
-        }
-        System.out.println("\n");
-
-        // Accept search key from user
         System.out.print("Enter Bogie ID to search: ");
         String searchKey = sc.nextLine().trim();
 
-        // Perform linear search
-        boolean found = linearSearchBogie(bogieIDs, searchKey);
+        boolean found = binarySearchBogie(bogieIDs, searchKey);
 
         if (found) {
             System.out.println("Search Result: Bogie exists in the consist.");
