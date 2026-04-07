@@ -1,65 +1,83 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
 
-// Bogie Class
-class Bogie {
-    String type;
-    int capacity;
+// Custom Runtime Exception
+class CargoSafetyException extends RuntimeException {
+    public CargoSafetyException(String message) {
+        super(message);
+    }
+}
 
-    public Bogie(String type, int capacity) {
-        this.type = type;
-        this.capacity = capacity;
+// Goods Bogie Class
+class GoodsBogie {
+    String shape;   // Rectangular / Cylindrical
+    String cargo;   // Petroleum, Coal, etc.
+
+    public GoodsBogie(String shape) {
+        this.shape = shape;
     }
 
-    public int getCapacity() {
-        return capacity;
+    public String getShape() {
+        return shape;
     }
 
-    public String getType() {
-        return type;
+    public String getCargo() {
+        return cargo;
+    }
+
+    public void setCargo(String cargo) {
+        this.cargo = cargo;
     }
 
     @Override
     public String toString() {
-        return "Bogie{Type='" + type + "', Capacity=" + capacity + "}";
+        return "GoodsBogie{Shape='" + shape + "', Cargo='" + cargo + "'}";
     }
 }
 
 // Main Application
 public class TrainConsistManagementApp {
 
-    // ✅ Method for filtering (important for test cases)
-    public static List<Bogie> filterHighCapacityBogies(List<Bogie> bogies, int threshold) {
-        return bogies.stream()
-                .filter(b -> b.getCapacity() > threshold) // Stream + Lambda
-                .collect(Collectors.toList());
+    // Cargo assignment logic with try-catch-finally
+    public static void assignCargo(GoodsBogie bogie, String cargoType) {
+        try {
+            // Validation
+            if (bogie.getShape().equalsIgnoreCase("Rectangular") &&
+                    cargoType.equalsIgnoreCase("Petroleum")) {
+
+                throw new CargoSafetyException(
+                        "Unsafe Cargo! Petroleum cannot be assigned to Rectangular bogie.");
+            }
+
+            // Safe assignment
+            bogie.setCargo(cargoType);
+            System.out.println("Cargo assigned successfully: " + cargoType);
+
+        } catch (CargoSafetyException e) {
+            // Handle exception
+            System.out.println("ERROR: " + e.getMessage());
+
+        } finally {
+            // Always executes
+            System.out.println("Cargo assignment attempt completed.\n");
+        }
     }
 
     public static void main(String[] args) {
 
-        // Create bogie list (UC7 reused)
-        List<Bogie> bogies = new ArrayList<>();
-        bogies.add(new Bogie("Sleeper", 72));
-        bogies.add(new Bogie("AC Chair Car", 56));
-        bogies.add(new Bogie("First Class", 24));
-        bogies.add(new Bogie("General", 80));
-        bogies.add(new Bogie("Sleeper", 72));
+        GoodsBogie b1 = new GoodsBogie("Cylindrical");
+        GoodsBogie b2 = new GoodsBogie("Rectangular");
 
-        System.out.println("--- Original Consist ---");
-        bogies.forEach(System.out::println);
+        // Safe assignment
+        assignCargo(b1, "Petroleum");
 
-        // Apply Stream Filtering
-        List<Bogie> filteredBogies = filterHighCapacityBogies(bogies, 60);
+        // Unsafe assignment
+        assignCargo(b2, "Petroleum");
 
-        System.out.println("\n--- High Capacity Bogies (Capacity > 60) ---");
-        if (filteredBogies.isEmpty()) {
-            System.out.println("No bogies match the criteria.");
-        } else {
-            filteredBogies.forEach(System.out::println);
-        }
+        // Program continues
+        assignCargo(b2, "Coal");
 
-        // Check original list integrity
-        System.out.println("\nOriginal list size: " + bogies.size());
+        System.out.println("Final Bogie States:");
+        System.out.println(b1);
+        System.out.println(b2);
     }
 }
